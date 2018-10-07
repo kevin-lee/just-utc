@@ -18,74 +18,81 @@ object UtcDateTimeSpec extends Properties {
   , Prop("testCompareToMore", testCompareToMore)
   , Prop("testCompareToEqual", testCompareToEqual)
   , Prop("testEqual", testEqual)
+  , Prop("testNotEqual", testNotEqual)
   , Prop("testLess", testLess)
-  , Prop("testLessThanOrEqual_LessCase", testLessThanOrEqual_LessCase)
-  , Prop("testLessThanOrEqual_EqualCase", testLessThanOrEqual_EqualCase)
+  , Prop("testLessThanOrEqualTo_LessCase", testLessThanOrEqualTo_LessCase)
+  , Prop("testLessThanOrEqualTo_EqualCase", testLessThanOrEqualTo_EqualCase)
   , Prop("testMore", testMore)
-  , Prop("testMoreThanOrEqual_MoreCase", testMoreThanOrEqual_MoreCase)
-  , Prop("testMoreThanOrEqual_EqualCase", testMoreThanOrEqual_EqualCase)
+  , Prop("testMoreThanOrEqualTo_MoreCase", testMoreThanOrEqualTo_MoreCase)
+  , Prop("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase)
   )
 
   def testFromUtcLocalDateTime: Property[Unit] = for {
-    expected <- Gen.integral(Range.linear(1L, Long.MaxValue)).log("expected")
+    expected <- Gen.long(Range.linear(1L, Long.MaxValue)).log("expected")
     localDateTime = JDateTimeInUtc.toLocalDateTime(expected)
     actual = UtcDateTime.fromUtcLocalDateTime(localDateTime)
     _ <- actual.epochMillis === expected
   } yield ()
 
   def testCompareToLess: Property[Unit] = for {
-    x <- Gen.integral(Range.linear(1L, 100000L)).log("x")
-    y <- Gen.integral(Range.linear(1L, 1000L)).log("y")
-    _ <- UtcDateTime(x).compareTo(UtcDateTime(x + y)) === -1
+    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue >> 1)).forAll
+    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
+    _ <- UtcDateTime(x).compare(UtcDateTime(x + y)) === -1
   } yield ()
 
   def testCompareToMore: Property[Unit] = for {
-    x <- Gen.integral(Range.linear(10000L, 100000L)).log("y")
-    y <- Gen.integral(Range.linear(1L, 1000L)).log("x")
-    _ <- UtcDateTime(x).compareTo(UtcDateTime(x - y)) === 1
+    x <- Gen.long(Range.linear(Long.MinValue >> 1, Long.MaxValue)).forAll
+    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
+    _ <- UtcDateTime(x).compare(UtcDateTime(x - y)) === 1
   } yield ()
 
   def testCompareToEqual: Property[Unit] = for {
-    x <- Gen.integral(Range.linear(10000L, 100000L)).log("y")
-    _ <- UtcDateTime(x).compareTo(UtcDateTime(x)) === 0
+    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
+    _ <- UtcDateTime(x).compare(UtcDateTime(x)) === 0
   } yield ()
 
   def testEqual: Property[Unit] = for {
-    x <- Gen.integral(Range.linear(10000L, 100000L)).log("y")
+    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
     _ <- assert(UtcDateTime(x) == UtcDateTime(x))
   } yield ()
 
+  def testNotEqual: Property[Unit] = for {
+    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
+    y <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).filter(_ != x).forAll
+    _ <- assert(UtcDateTime(x) != UtcDateTime(y))
+  } yield ()
+
   def testLess: Property[Unit] = for {
-    x <- Gen.integral(Range.linear(1L, 100000L)).log("x")
-    y <- Gen.integral(Range.linear(1L, 1000L)).log("y")
+    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue >> 1)).forAll
+    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
     _ <- assert(UtcDateTime(x) < UtcDateTime(x + y))
   } yield ()
 
-  def testLessThanOrEqual_LessCase: Property[Unit] = for {
-    x <- Gen.integral(Range.linear(1L, 100000L)).log("x")
-    y <- Gen.integral(Range.linear(1L, 1000L)).log("y")
+  def testLessThanOrEqualTo_LessCase: Property[Unit] = for {
+    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue >> 1)).forAll
+    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
     _ <- assert(UtcDateTime(x) <= UtcDateTime(x + y))
   } yield ()
 
-  def testLessThanOrEqual_EqualCase: Property[Unit] = for {
-    x <- Gen.integral(Range.linear(10000L, 100000L)).log("y")
+  def testLessThanOrEqualTo_EqualCase: Property[Unit] = for {
+    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
     _ <- assert(UtcDateTime(x) <= UtcDateTime(x))
   } yield ()
 
   def testMore: Property[Unit] = for {
-    x <- Gen.integral(Range.linear(10000L, 100000L)).log("y")
-    y <- Gen.integral(Range.linear(1L, 1000L)).log("x")
+    x <- Gen.long(Range.linear(Long.MinValue >> 1, Long.MaxValue)).forAll
+    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
     _ <- assert(UtcDateTime(x) > UtcDateTime(x - y))
   } yield ()
 
-  def testMoreThanOrEqual_MoreCase: Property[Unit] = for {
-    x <- Gen.integral(Range.linear(10000L, 100000L)).log("y")
-    y <- Gen.integral(Range.linear(1L, 1000L)).log("x")
+  def testMoreThanOrEqualTo_MoreCase: Property[Unit] = for {
+    x <- Gen.long(Range.linear(Long.MinValue >> 1, Long.MaxValue)).forAll
+    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
     _ <- assert(UtcDateTime(x) >= UtcDateTime(x - y))
   } yield ()
 
-  def testMoreThanOrEqual_EqualCase: Property[Unit] = for {
-    x <- Gen.integral(Range.linear(10000L, 100000L)).log("y")
+  def testMoreThanOrEqualTo_EqualCase: Property[Unit] = for {
+    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
     _ <- assert(UtcDateTime(x) >= UtcDateTime(x))
   } yield ()
 

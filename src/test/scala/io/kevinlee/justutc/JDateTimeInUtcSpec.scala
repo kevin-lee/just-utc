@@ -18,7 +18,7 @@ object JDateTimeInUtcSpec extends Properties {
   )
 
   def testToLocalDateTime: Property[Unit] = for {
-    expected <- Gen.integral(Range.linear(1L, Long.MaxValue)).log("expected")
+    expected <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).log("expected")
     localDateTime = JDateTimeInUtc.toLocalDateTime(expected)
     actual = JDateTimeInUtc.toEpochMilli(localDateTime)
     _ <- actual === expected

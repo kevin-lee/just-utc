@@ -21,6 +21,6 @@ object JDateTimeInUtcSpec extends Properties {
     expected <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).log("expected")
     localDateTime = JDateTimeInUtc.toLocalDateTime(expected)
     actual = JDateTimeInUtc.toEpochMilli(localDateTime)
-    _ <- actual === expected
+    _ <- actual ==== expected
   } yield ()
 }

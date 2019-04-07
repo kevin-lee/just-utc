@@ -5,16 +5,13 @@ lazy val root = (project in file(".")).
     inThisBuild(List(
       organization := "io.kevinlee",
       scalaVersion := "2.12.7",
-      crossScalaVersions := Seq("2.11.12", "2.12.7"),
+      crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.7"),
       version      := "0.1.0-SNAPSHOT"
     )),
     name := "just-utc",
     resolvers += hedgehogResolver,
     libraryDependencies ++= hedgehogAll
   )
-  .dependsOn(ProjectRef(gitSubmodule("submodule/scala-hedgehog"), "core") % Test)
-  .dependsOn(ProjectRef(gitSubmodule("submodule/scala-hedgehog"), "runner") % Test)
-  .dependsOn(ProjectRef(gitSubmodule("submodule/scala-hedgehog"), "sbt-test") % Test)
 
 testFrameworks := Seq(TestFramework("hedgehog.sbt.Framework"))
 

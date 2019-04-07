@@ -1,3 +1,0 @@
-[submodule "submodule/scala-hedgehog"]
-	path = submodule/scala-hedgehog
-	url = git@github.com:Kevin-Lee/scala-hedgehog.git

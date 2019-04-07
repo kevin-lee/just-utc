@@ -7,7 +7,7 @@ object Dependencies {
       url("https://dl.bintray.com/hedgehogqa/scala-hedgehog")
     )(Resolver.ivyStylePatterns)
 
-  lazy val hedgehogVersion = "eb31ccb5e2549c9424969cc3b3231f49330dd31f"
+  lazy val hedgehogVersion = "55d9828dc6bcdc85ba3ebb31efd541d0a14423bf"
 
   lazy val hedgehogCore = "hedgehog" %% "hedgehog-core" % hedgehogVersion % Test
   lazy val hedgehogRunner = "hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test

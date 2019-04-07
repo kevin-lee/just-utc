@@ -1,4 +1,4 @@
-package io.kevinlee.justutc
+package kevinlee.justutc
 
 import java.time.{Instant, LocalDateTime, ZoneId, ZoneOffset}
 

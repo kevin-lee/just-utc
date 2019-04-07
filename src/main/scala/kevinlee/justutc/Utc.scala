@@ -1,4 +1,4 @@
-package io.kevinlee.justutc
+package kevinlee.justutc
 
 import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
@@ -11,7 +11,7 @@ import scala.math.Ordered
   * @author Kevin Lee
   * @since 2018-09-12
   */
-case class UtcDateTime(epochMillis: Long) extends Ordered[UtcDateTime] {
+final case class Utc(epochMillis: Long) extends Ordered[Utc] {
 
   lazy val jLocalDateTime: LocalDateTime = JDateTimeInUtc.toLocalDateTime(epochMillis)
 
@@ -32,7 +32,7 @@ case class UtcDateTime(epochMillis: Long) extends Ordered[UtcDateTime] {
     */
   def weekOfYear: Int = jLocalDateTime.get(WeekFields.of(Locale.ROOT).weekOfWeekBasedYear())
 
-  def compare(that: UtcDateTime): Int = this.epochMillis.compareTo(that.epochMillis)
+  def compare(that: Utc): Int = this.epochMillis.compareTo(that.epochMillis)
 
   lazy val render: String = jLocalDateTime.toString
 
@@ -41,14 +41,14 @@ case class UtcDateTime(epochMillis: Long) extends Ordered[UtcDateTime] {
 
 }
 
-object UtcDateTime {
+object Utc {
 
-  implicit object UtcDateTimeOrdering extends Ordering[UtcDateTime] {
-    override def compare(x: UtcDateTime, y: UtcDateTime): Int = x.compare(y)
+  implicit object UtcDateTimeOrdering extends Ordering[Utc] {
+    override def compare(x: Utc, y: Utc): Int = x.compare(y)
   }
 
-  def now(): UtcDateTime = UtcDateTime(Clock.systemUTC().millis())
+  def now(): Utc = Utc(Clock.systemUTC().millis())
 
-  def fromUtcLocalDateTime(localDateTime: LocalDateTime): UtcDateTime =
-    UtcDateTime(JDateTimeInUtc.toEpochMilli(localDateTime))
+  def fromUtcLocalDateTime(localDateTime: LocalDateTime): Utc =
+    Utc(JDateTimeInUtc.toEpochMilli(localDateTime))
 }

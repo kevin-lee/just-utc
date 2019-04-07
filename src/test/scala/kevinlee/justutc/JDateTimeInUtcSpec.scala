@@ -1,11 +1,9 @@
-package io.kevinlee.justutc
+package kevinlee.justutc
 
 import hedgehog._
 import hedgehog.Gen._
 import hedgehog.runner._
-import hedgehog.Property. _
-import hedgehog.core.{PropertyT, PropertyTReporting}
-import hedgehog.predef.Monad
+
 
 
 /**
@@ -13,14 +11,13 @@ import hedgehog.predef.Monad
   * @since 2018-10-04
   */
 object JDateTimeInUtcSpec extends Properties {
-  override def tests: List[Prop] = List(
-    Prop("testToLocalDateTime", testToLocalDateTime)
+  override def tests: List[Test] = List(
+    property("testToLocalDateTime", testToLocalDateTime)
   )
 
-  def testToLocalDateTime: Property[Unit] = for {
+  def testToLocalDateTime: Property = for {
     expected <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).log("expected")
     localDateTime = JDateTimeInUtc.toLocalDateTime(expected)
     actual = JDateTimeInUtc.toEpochMilli(localDateTime)
-    _ <- actual ==== expected
-  } yield ()
+  } yield actual ==== expected
 }

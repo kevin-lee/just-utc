@@ -1,19 +1,59 @@
 import Dependencies._
+import ProjectInfo._
+import kevinlee.sbt.SbtCommon.crossVersionProps
+import kevinlee.semver.{Major, Minor, SemanticVersion}
+import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 lazy val root = (project in file(".")).
-  settings(
-    inThisBuild(List(
-      organization := "kevinlee",
-      scalaVersion := "2.12.7",
-      crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.7"),
-      version      := "0.1.0-SNAPSHOT"
-    )),
-    name := "just-utc",
-    resolvers += hedgehogResolver,
-    libraryDependencies ++= hedgehogAll
+    settings(
+      inThisBuild(List(
+        organization := "kevinlee"
+      , scalaVersion := ProjectScalaVersion
+      , crossScalaVersions := CrossScalaVersions
+      , version      := ProjectVersion
+      , developers   := List(Developer(
+          "Kevin-Lee", "Kevin Lee", "kevin.code@kevinlee.io", url("https://github.com/Kevin-Lee")
+        ))
+    ))
+    , name := "just-utc"
+    , scalacOptions :=
+      crossVersionProps(Seq.empty, SemanticVersion.parseUnsafe(scalaVersion.value)) {
+        case (Major(2), Minor(12)) =>
+          scalacOptions.value ++ commonScalacOptions
+        case (Major(2), Minor(11)) =>
+          (scalacOptions.value ++ commonScalacOptions).filter(_ != "-Ywarn-unused-import")
+        case _ =>
+          (scalacOptions.value ++ commonScalacOptions)
+            .filter(option =>
+              option != "-Ywarn-unused-import" && option != "-Ywarn-numeric-widen"
+            )
+      }.distinct
+    , wartremoverErrors in (Compile, compile) ++= commonWarts
+    , wartremoverErrors in (Test, compile) ++= commonWarts
+    , resolvers += hedgehogResolver
+    , libraryDependencies ++= hedgehogAll
+    , dependencyOverrides ++= crossVersionProps(Seq.empty[ModuleID], SemanticVersion.parseUnsafe(scalaVersion.value)) {
+      case (Major(2), Minor(10)) =>
+        Seq("org.wartremover" %% "wartremover" % "2.3.7")
+      case x =>
+        Seq.empty
+    }
+    , testFrameworks := Seq(TestFramework("hedgehog.sbt.Framework"))
+    /* Bintray { */
+    , bintrayPackageLabels := Seq("Scala", "UTC", "DateTime")
+    , bintrayVcsUrl := Some("""git@github.com:Kevin-Lee/just-utc.git""")
+    /* } Bintray */
+    /* Coveralls { */
+    , coverageHighlighting := (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 10)) =>
+        false
+      case _ =>
+        true
+    })
+    , coverallsTokenFile := Option(s"""${Path.userHome.absolutePath}/.coveralls-credentials""")
+    /* } Coveralls */
   )
 
-testFrameworks := Seq(TestFramework("hedgehog.sbt.Framework"))
 
 def gitSubmodule(path: String): File = {
   @annotation.tailrec

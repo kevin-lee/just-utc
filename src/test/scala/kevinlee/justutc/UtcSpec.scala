@@ -1,11 +1,7 @@
 package kevinlee.justutc
 
 import hedgehog._
-import hedgehog.Gen._
 import hedgehog.runner._
-import hedgehog.Property. _
-import hedgehog.core.{PropertyT, PropertyTReporting}
-import hedgehog.predef.Monad
 
 /**
   * @author Kevin Lee
@@ -49,10 +45,12 @@ object UtcSpec extends Properties {
     x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
   } yield Utc(x).compare(Utc(x)) ==== 0
 
+  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   def testEqual: Property = for {
     x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
   } yield Result.assert(Utc(x) == Utc(x))
 
+  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   def testNotEqual: Property = for {
     x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
     y <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).filter(_ != x).forAll

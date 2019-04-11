@@ -1,7 +1,6 @@
 package kevinlee.justutc
 
 import hedgehog._
-import hedgehog.Gen._
 import hedgehog.runner._
 
 

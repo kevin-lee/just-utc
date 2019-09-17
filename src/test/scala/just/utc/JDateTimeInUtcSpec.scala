@@ -1,9 +1,7 @@
-package kevinlee.justutc
+package just.utc
 
 import hedgehog._
 import hedgehog.runner._
-
-
 
 /**
   * @author Kevin Lee

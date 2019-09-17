@@ -1,4 +1,4 @@
-package kevinlee.justutc
+package just.utc
 
 import hedgehog._
 import hedgehog.runner._

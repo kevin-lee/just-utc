@@ -15,17 +15,19 @@ ThisBuild / developers   := List(Developer(
 lazy val justUtc = (project in file(".")).
     settings(
       name := "just-utc"
-    , wartremoverErrors in (Compile, compile) ++= commonWarts
-    , wartremoverErrors in (Test, compile) ++= commonWarts
     , resolvers += hedgehogResolver
-    , libraryDependencies ++= hedgehogAll
-    , dependencyOverrides ++= crossVersionProps(Seq.empty[ModuleID], SemanticVersion.parseUnsafe(scalaVersion.value)) {
-      case (Major(2), Minor(10)) =>
-        Seq("org.wartremover" %% "wartremover" % "2.3.7")
-      case x =>
-        Seq.empty
-    }
-    , testFrameworks := Seq(TestFramework("hedgehog.sbt.Framework"))
+    , libraryDependencies := hedgehogAll ++ crossVersionProps(
+          Seq.empty[ModuleID]
+        , SemanticVersion.parseUnsafe(scalaVersion.value)) {
+        case (Major(2), Minor(10)) =>
+          libraryDependencies.value
+            .filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
+        case x =>
+          libraryDependencies.value
+      }
+    , wartremoverErrors in (Compile, compile) ++= commonWarts((scalaBinaryVersion in update).value)
+    , wartremoverErrors in (Test, compile) ++= commonWarts((scalaBinaryVersion in update).value)
+    , testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework"))
     /* Bintray { */
     , bintrayPackageLabels := Seq("Scala", "UTC", "DateTime")
     , bintrayVcsUrl := Some("""git@github.com:Kevin-Lee/just-utc.git""")

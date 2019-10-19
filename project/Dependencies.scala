@@ -2,17 +2,14 @@ import sbt._
 
 object Dependencies {
 
-  lazy val hedgehogResolver =
-    Resolver.url("bintray-scala-hedgehog",
-      url("https://dl.bintray.com/hedgehogqa/scala-hedgehog")
-    )(Resolver.ivyStylePatterns)
+  lazy val hedgehogResolver = "bintray-scala-hedgehog" at "https://dl.bintray.com/hedgehogqa/scala-hedgehog"
 
-  lazy val hedgehogVersion = "06b22e95ca1a32a2569914824ffe6fc4cfd62c62"
+  lazy val hedgehogVersion = "6dba7c9ba065e423000e9aa2b6981ce3d70b74cb"
 
-  lazy val hedgehogCore = "hedgehog" %% "hedgehog-core" % hedgehogVersion % Test
-  lazy val hedgehogRunner = "hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test
-  lazy val hedgehogSbt = "hedgehog" %% "hedgehog-sbt" % hedgehogVersion % Test
+  lazy val hedgehogCore: ModuleID = "hedgehog" %% "hedgehog-core" % hedgehogVersion
+  lazy val hedgehogRunner: ModuleID = "hedgehog" %% "hedgehog-runner" % hedgehogVersion
+  lazy val hedgehogSbt: ModuleID = "hedgehog" %% "hedgehog-sbt" % hedgehogVersion
 
-  lazy val hedgehogAll = Seq(hedgehogCore, hedgehogRunner, hedgehogSbt)
+  lazy val hedgehogAll: Seq[ModuleID] = Seq(hedgehogCore, hedgehogRunner, hedgehogSbt).map(_ % Test)
 
 }

@@ -4,6 +4,9 @@ import kevinlee.sbt.SbtCommon.crossVersionProps
 import just.semver.SemVer
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
+val ProjectScalaVersion: String = "2.13.1"
+val CrossScalaVersions: Seq[String] = Seq("2.10.7", "2.11.12", "2.12.11", ProjectScalaVersion)
+
 ThisBuild / scalaVersion := ProjectScalaVersion
 ThisBuild / organization := "io.kevinlee"
 ThisBuild / version      := ProjectVersion

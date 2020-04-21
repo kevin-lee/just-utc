@@ -1,5 +1,7 @@
 package just.utc
 
+import java.time.Instant
+
 import hedgehog._
 import hedgehog.runner._
 
@@ -23,8 +25,12 @@ object UtcSpec extends Properties {
   , property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase)
   )
 
+  val validInstantMin: Long = Instant.MIN.getEpochSecond
+  val validInstantMax: Long = Instant.MAX.getEpochSecond
+
+  // TODO: Do invalid range handling test as well
   def testFromUtcLocalDateTime: Property = for {
-    expected <- Gen.long(Range.linear(1L, Long.MaxValue)).log("expected")
+    expected <- Gen.long(Range.linear(validInstantMin, validInstantMax)).log("expected")
   } yield {
     val localDateTime = JDateTimeInUtc.toLocalDateTime(expected)
     val actual = Utc.fromUtcLocalDateTime(localDateTime)
@@ -32,56 +38,58 @@ object UtcSpec extends Properties {
   }
 
   def testCompareToLess: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue >> 1)).forAll
-    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
-  } yield Utc(x).compare(Utc(x + y)) ==== -1
+    x <- Gen.long(Range.linear(validInstantMin, validInstantMax)).forAll
+    y <- Gen.long(Range.linear(1L, validInstantMax)).forAll
+  } yield Utc.unsafeFromEpochMillis(x).compare(Utc.unsafeFromEpochMillis(x + y)) ==== -1
 
   def testCompareToMore: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue >> 1, Long.MaxValue)).forAll
-    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
-  } yield Utc(x).compare(Utc(x - y)) ==== 1
+    x <- Gen.long(Range.linear(validInstantMin, Long.MaxValue)).forAll
+    y <- Gen.long(Range.linear(1L, validInstantMax)).forAll
+  } yield Utc.unsafeFromEpochMillis(x).compare(Utc.unsafeFromEpochMillis(x - y)) ==== 1
 
   def testCompareToEqual: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
-  } yield Utc(x).compare(Utc(x)) ==== 0
+    x <- Gen.long(Range.linear(validInstantMin, validInstantMax)).forAll
+  } yield Utc.unsafeFromEpochMillis(x).compare(Utc.unsafeFromEpochMillis(x)) ==== 0
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   def testEqual: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
-  } yield Result.assert(Utc(x) == Utc(x))
+    x <- Gen.long(Range.linear(validInstantMin, validInstantMax)).forAll
+  } yield {
+    Result.assert(Utc.unsafeFromEpochMillis(x) == Utc.unsafeFromEpochMillis(x))
+  }
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   def testNotEqual: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
-    y <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).filter(_ != x).forAll
-  } yield Result.assert(Utc(x) != Utc(y))
+    x <- Gen.long(Range.linear(validInstantMin, validInstantMax)).forAll
+    y <- Gen.long(Range.linear(validInstantMin, validInstantMax)).filter(_ != x).forAll
+  } yield Result.assert(Utc.unsafeFromEpochMillis(x) != Utc.unsafeFromEpochMillis(y))
 
   def testLess: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue >> 1)).forAll
-    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
-  } yield Result.assert(Utc(x) < Utc(x + y))
+    x <- Gen.long(Range.linear(validInstantMin, validInstantMax)).forAll
+    y <- Gen.long(Range.linear(1L, validInstantMax)).forAll
+  } yield Result.assert(Utc.unsafeFromEpochMillis(x) < Utc.unsafeFromEpochMillis(x + y))
 
   def testLessThanOrEqualTo_LessCase: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue >> 1)).forAll
-    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
-  } yield Result.assert(Utc(x) <= Utc(x + y))
+    x <- Gen.long(Range.linear(validInstantMin, validInstantMax)).forAll
+    y <- Gen.long(Range.linear(1L, validInstantMax)).forAll
+  } yield Result.assert(Utc.unsafeFromEpochMillis(x) <= Utc.unsafeFromEpochMillis(x + y))
 
   def testLessThanOrEqualTo_EqualCase: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
-  } yield Result.assert(Utc(x) <= Utc(x))
+    x <- Gen.long(Range.linear(validInstantMin, validInstantMax)).forAll
+  } yield Result.assert(Utc.unsafeFromEpochMillis(x) <= Utc.unsafeFromEpochMillis(x))
 
   def testMore: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue >> 1, Long.MaxValue)).forAll
-    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
-  } yield Result.assert(Utc(x) > Utc(x - y))
+    x <- Gen.long(Range.linear(validInstantMin, Long.MaxValue)).forAll
+    y <- Gen.long(Range.linear(1L, validInstantMax)).forAll
+  } yield Result.assert(Utc.unsafeFromEpochMillis(x) > Utc.unsafeFromEpochMillis(x - y))
 
   def testMoreThanOrEqualTo_MoreCase: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue >> 1, Long.MaxValue)).forAll
-    y <- Gen.long(Range.linear(1L, Long.MaxValue >> 1)).forAll
-  } yield Result.assert(Utc(x) >= Utc(x - y))
+    x <- Gen.long(Range.linear(validInstantMin, Long.MaxValue)).forAll
+    y <- Gen.long(Range.linear(1L, validInstantMax)).forAll
+  } yield Result.assert(Utc.unsafeFromEpochMillis(x) >= Utc.unsafeFromEpochMillis(x - y))
 
   def testMoreThanOrEqualTo_EqualCase: Property = for {
-    x <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).forAll
-  } yield Result.assert(Utc(x) >= Utc(x))
+    x <- Gen.long(Range.linear(validInstantMin, validInstantMax)).forAll
+  } yield Result.assert(Utc.unsafeFromEpochMillis(x) >= Utc.unsafeFromEpochMillis(x))
 
 }

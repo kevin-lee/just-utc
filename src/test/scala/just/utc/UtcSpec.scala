@@ -41,7 +41,7 @@ object UtcSpec extends Properties {
   def testFromUtcLocalDateTime: Property = for {
     expected <- Gen.long(Range.linear(validInstantMin, validInstantMax)).log("expected")
   } yield {
-    val localDateTime = JDateTimeInUtc.toLocalDateTime(expected)
+    val localDateTime = JDateTimeInUtc.unsafeToLocalDateTime(expected)
     val actual = Utc.fromUtcLocalDateTime(localDateTime)
     actual.epochMillis ==== expected
   }

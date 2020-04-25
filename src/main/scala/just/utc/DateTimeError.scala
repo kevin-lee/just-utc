@@ -1,6 +1,7 @@
 package just.utc
 
-import java.time.DateTimeException
+import java.time.{DateTimeException, Instant, ZoneId}
+import java.time.zone.ZoneRulesException
 
 /**
   * @author Kevin Lee
@@ -9,24 +10,42 @@ import java.time.DateTimeException
 sealed trait DateTimeError
 
 object DateTimeError {
-  final case class ExceededInstantRange(
+
+  final case class ZoneRules(zoneId: ZoneId, cause: ZoneRulesException) extends DateTimeError
+
+  final case class EpochMillisDateTime(
     millis: Long
-  , min: Long
-  , max: Long
   , cause: DateTimeException
   ) extends DateTimeError
 
+  final case class InstantDateTime(
+    instant: Instant
+  , cause: DateTimeException
+  ) extends DateTimeError
+
+  final case class ArithmeticError(message: String, cause: ArithmeticException) extends DateTimeError
+
   final case class ExceededLocalDateTimeRange(millis: Long, cause: DateTimeException) extends DateTimeError
 
-  def exceededInstantRange(
+
+  def zoneRules(zoneId: ZoneId, cause: ZoneRulesException): DateTimeError = ZoneRules(zoneId, cause)
+
+  def epochMillisDateTime(
     millis: Long
-  , min: Long
-  , max: Long
   , cause: DateTimeException
   ): DateTimeError =
-    ExceededInstantRange(millis, min, max, cause)
+    EpochMillisDateTime(millis, cause)
+
+  def instantDateTime(
+    instant: Instant
+  , cause: DateTimeException
+  ): DateTimeError =
+    InstantDateTime(instant, cause)
+
+  def arithmeticError(message: String, cause: ArithmeticException): DateTimeError = ArithmeticError(message, cause)
 
   def exceededLocalDateTimeRange(millis: Long, cause: DateTimeException): DateTimeError =
     ExceededLocalDateTimeRange(millis, cause)
+
 
 }

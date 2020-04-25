@@ -1,5 +1,6 @@
 package just.utc
 
+import java.time.temporal.UnsupportedTemporalTypeException
 import java.time.zone.ZoneRulesException
 import java.time.{DateTimeException, Instant, LocalDateTime, ZoneId, ZoneOffset}
 
@@ -41,9 +42,38 @@ object JDateTimeInUtc extends CrossVersion {
       case Left(DateTimeError.InstantDateTime(_, cause)) => throw cause
       case Left(DateTimeError.ArithmeticError(_, cause)) => throw cause
       case Left(DateTimeError.ZoneRules(_, cause)) => throw cause
-      case Left(DateTimeError.ExceededLocalDateTimeRange(_, cause)) => throw cause
+      case Left(DateTimeError.UnsupportedTemporalType(_, cause)) => throw cause
+      case Left(DateTimeError.LocalDateTimeError(_, cause)) => throw cause
     }
 
-  def toEpochMilli(localDateTime: LocalDateTime): Long =
-    localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli
+  def toEpochMilli(localDateTime: LocalDateTime): Either[DateTimeError, Long] = try {
+    localDateTime.toInstant(ZoneOffsetUtc).toEpochMilli.right
+  } catch {
+    case zoneRulesException: ZoneRulesException =>
+      DateTimeError.zoneRules(ZoneOffsetUtc, zoneRulesException).left
+    case unsupportedTemporalTypeException: UnsupportedTemporalTypeException =>
+      DateTimeError.unsupportedTemporalType(localDateTime, unsupportedTemporalTypeException).left
+    case dateTimeException: DateTimeException =>
+      DateTimeError.localDateTimeError(localDateTime, dateTimeException).left
+    case arithmeticException: ArithmeticException =>
+      DateTimeError.arithmeticError(
+        s"""ArithmeticException when localDateTime.toInstant($ZoneOffsetUtc)
+           | - localDateTime: $localDateTime
+           |""".stripMargin
+      , arithmeticException
+      ).left
+  }
+
+  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
+  def unsafeToEpochMilli(localDateTime: LocalDateTime): Long =
+    toEpochMilli(localDateTime) match {
+      case Right(localDateTime) => localDateTime
+      case Left(DateTimeError.EpochMillisDateTime(_, cause)) => throw cause
+      case Left(DateTimeError.InstantDateTime(_, cause)) => throw cause
+      case Left(DateTimeError.ArithmeticError(_, cause)) => throw cause
+      case Left(DateTimeError.ZoneRules(_, cause)) => throw cause
+      case Left(DateTimeError.UnsupportedTemporalType(_, cause)) => throw cause
+      case Left(DateTimeError.LocalDateTimeError(_, cause)) => throw cause
+    }
+
 }

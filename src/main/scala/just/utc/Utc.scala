@@ -88,7 +88,8 @@ object Utc {
       case Left(DateTimeError.InstantDateTime(_, cause)) => throw cause
       case Left(DateTimeError.ArithmeticError(_, cause)) => throw cause
       case Left(DateTimeError.ZoneRules(_, cause)) => throw cause
-      case Left(DateTimeError.ExceededLocalDateTimeRange(_, cause)) => throw cause
+      case Left(DateTimeError.UnsupportedTemporalType(_, cause)) => throw cause
+      case Left(DateTimeError.LocalDateTimeError(_, cause)) => throw cause
     }
 
 

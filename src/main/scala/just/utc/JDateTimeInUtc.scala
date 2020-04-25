@@ -57,8 +57,8 @@ object JDateTimeInUtc extends CrossVersion {
       DateTimeError.localDateTimeError(localDateTime, dateTimeException).left
     case arithmeticException: ArithmeticException =>
       DateTimeError.arithmeticError(
-        s"""ArithmeticException when localDateTime.toInstant($ZoneOffsetUtc)
-           | - localDateTime: $localDateTime
+        s"""ArithmeticException when localDateTime.toInstant(${ZoneOffsetUtc.toString})
+           | - localDateTime: ${localDateTime.toString}
            |""".stripMargin
       , arithmeticException
       ).left

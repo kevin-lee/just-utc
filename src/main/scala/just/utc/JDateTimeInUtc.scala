@@ -1,6 +1,9 @@
 package just.utc
 
+import java.time.zone.ZoneRulesException
 import java.time.{DateTimeException, Instant, LocalDateTime, ZoneId, ZoneOffset}
+
+import just.fp.syntax._
 
 /**
   * @author Kevin Lee
@@ -12,22 +15,21 @@ object JDateTimeInUtc extends CrossVersion {
 
   def toLocalDateTime(millis: Long): Either[DateTimeError, LocalDateTime] = for {
     instant <- try {
-          Right(Instant.ofEpochMilli(millis))
+          Instant.ofEpochMilli(millis).right
         } catch {
           case dateTimeException: DateTimeException =>
-            Left(
-              DateTimeError.exceededInstantRange(
-                millis
-              , Instant.MIN.getEpochSecond
-              , Instant.MAX.getEpochSecond
-              , dateTimeException)
-            )
+            DateTimeError.epochMillisDateTime(
+              millis
+            , dateTimeException
+            ).left
         }
     localDateTime <- try {
-          Right(LocalDateTime.ofInstant(instant, ZoneIdUtc))
+          LocalDateTime.ofInstant(instant, ZoneIdUtc).right
         } catch {
+          case zoneRulesException: ZoneRulesException =>
+            DateTimeError.zoneRules(ZoneIdUtc, zoneRulesException).left
           case dateTimeException: DateTimeException =>
-          Left(DateTimeError.exceededLocalDateTimeRange(millis, dateTimeException))
+            DateTimeError.instantDateTime(instant, dateTimeException).left
         }
   } yield localDateTime
 
@@ -35,7 +37,10 @@ object JDateTimeInUtc extends CrossVersion {
   def unsafeToLocalDateTime(millis: Long): LocalDateTime =
     toLocalDateTime(millis) match {
       case Right(localDateTime) => localDateTime
-      case Left(DateTimeError.ExceededInstantRange(_, _, _, cause)) => throw cause
+      case Left(DateTimeError.EpochMillisDateTime(_, cause)) => throw cause
+      case Left(DateTimeError.InstantDateTime(_, cause)) => throw cause
+      case Left(DateTimeError.ArithmeticError(_, cause)) => throw cause
+      case Left(DateTimeError.ZoneRules(_, cause)) => throw cause
       case Left(DateTimeError.ExceededLocalDateTimeRange(_, cause)) => throw cause
     }
 

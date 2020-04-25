@@ -5,6 +5,8 @@ import java.time.temporal.WeekFields
 import java.time.{Clock, DateTimeException, Instant, LocalDateTime}
 import java.util.Locale
 
+import just.fp.syntax._
+
 import just.utc.JDateTimeInUtc.ZoneIdUtc
 
 import scala.math.Ordered
@@ -69,25 +71,24 @@ object Utc {
 
   def fromEpochMillis(epochMillis: Long): Either[DateTimeError, Utc] =
     try {
-      Right(new Utc(Instant.ofEpochMilli(epochMillis)))
+      new Utc(Instant.ofEpochMilli(epochMillis)).right
     } catch {
       case dateTimeException: DateTimeException =>
-        Left(
-          DateTimeError.exceededInstantRange(
-            epochMillis
-            , Instant.MIN.getEpochSecond
-            , Instant.MAX.getEpochSecond
-            , dateTimeException)
-        )
+        DateTimeError.epochMillisDateTime(
+          epochMillis
+        , dateTimeException
+        ).left
     }
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   def unsafeFromEpochMillis(epochMillis: Long): Utc =
     fromEpochMillis(epochMillis) match {
       case Right(utc) => utc
-      case Left(DateTimeError.ExceededInstantRange(_, _, _, cause)) => throw cause
+      case Left(DateTimeError.EpochMillisDateTime(_, cause)) => throw cause
+      case Left(DateTimeError.InstantDateTime(_, cause)) => throw cause
+      case Left(DateTimeError.ArithmeticError(_, cause)) => throw cause
+      case Left(DateTimeError.ZoneRules(_, cause)) => throw cause
       case Left(DateTimeError.ExceededLocalDateTimeRange(_, cause)) => throw cause
-
     }
 
 

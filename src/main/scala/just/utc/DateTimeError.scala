@@ -1,6 +1,7 @@
 package just.utc
 
-import java.time.{DateTimeException, Instant, ZoneId}
+import java.time.temporal.UnsupportedTemporalTypeException
+import java.time.{DateTimeException, Instant, LocalDateTime, ZoneId}
 import java.time.zone.ZoneRulesException
 
 /**
@@ -25,7 +26,15 @@ object DateTimeError {
 
   final case class ArithmeticError(message: String, cause: ArithmeticException) extends DateTimeError
 
-  final case class ExceededLocalDateTimeRange(millis: Long, cause: DateTimeException) extends DateTimeError
+  final case class LocalDateTimeError(
+    localDateTime: LocalDateTime
+  , cause: DateTimeException
+  ) extends DateTimeError
+
+  final case class UnsupportedTemporalType(
+    localDateTime: LocalDateTime
+  , cause: UnsupportedTemporalTypeException
+  ) extends DateTimeError
 
 
   def zoneRules(zoneId: ZoneId, cause: ZoneRulesException): DateTimeError = ZoneRules(zoneId, cause)
@@ -42,10 +51,20 @@ object DateTimeError {
   ): DateTimeError =
     InstantDateTime(instant, cause)
 
-  def arithmeticError(message: String, cause: ArithmeticException): DateTimeError = ArithmeticError(message, cause)
+  def arithmeticError(message: String, cause: ArithmeticException): DateTimeError =
+    ArithmeticError(message, cause)
 
-  def exceededLocalDateTimeRange(millis: Long, cause: DateTimeException): DateTimeError =
-    ExceededLocalDateTimeRange(millis, cause)
+  def localDateTimeError(
+    localDateTime: LocalDateTime
+  , cause: DateTimeException
+  ): DateTimeError =
+    LocalDateTimeError(localDateTime, cause)
+
+  def unsupportedTemporalType(
+    localDateTime: LocalDateTime
+  , cause: UnsupportedTemporalTypeException
+  ): DateTimeError =
+    UnsupportedTemporalType(localDateTime, cause)
 
 
 }

@@ -11,14 +11,17 @@ import hedgehog.runner._
   */
 object JDateTimeInUtcSpec extends Properties with CrossVersion {
   override def tests: List[Test] = List(
-    property("testToLocalDateTime", testToLocalDateTime)
+    property(
+      "round-trip test of JDateTimeInUtc.toLocalDateTime and JDateTimeInUtc.toEpochMilli"
+    , testToLocalDateTime
+    )
   )
 
   def testToLocalDateTime: Property = for {
     expected <- Gen.long(Range.linear(Long.MinValue, Long.MaxValue)).log("expected")
   } yield {
     val localDateTime: Either[DateTimeError, LocalDateTime] = JDateTimeInUtc.toLocalDateTime(expected)
-    val actual: Either[DateTimeError, Long] = localDateTime.map(JDateTimeInUtc.toEpochMilli)
+    val actual: Either[DateTimeError, Long] = localDateTime.flatMap(JDateTimeInUtc.toEpochMilli)
     actual ==== Right(expected)
   }
 }

@@ -5,7 +5,7 @@ import just.semver.SemVer
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 val ProjectScalaVersion: String = "2.13.1"
-val CrossScalaVersions: Seq[String] = Seq("2.10.7", "2.11.12", "2.12.11", ProjectScalaVersion)
+val CrossScalaVersions: Seq[String] = Seq("2.11.12", "2.12.11", ProjectScalaVersion)
 
 lazy val justFp: ModuleID = "io.kevinlee" %% "just-fp" % "1.3.5"
 
@@ -27,7 +27,6 @@ ThisBuild / scmInfo :=
 lazy val justUtc = (project in file(".")).
     settings(
       name := "just-utc"
-    , resolvers += hedgehogResolver
     , libraryDependencies := hedgehogAll ++ crossVersionProps(
           Seq(justFp)
         , SemVer.parseUnsafe(scalaVersion.value)) {
@@ -37,8 +36,8 @@ lazy val justUtc = (project in file(".")).
         case x =>
           libraryDependencies.value
       }
-    , unmanagedSourceDirectories in Compile ++= {
-      val sharedSourceDir = (baseDirectory in ThisBuild).value / "src/main"
+    , Compile / unmanagedSourceDirectories ++= {
+      val sharedSourceDir = (ThisBuild / baseDirectory).value / "src/main"
       if (scalaVersion.value.startsWith("2.10") || scalaVersion.value.startsWith("2.11"))
         Seq(sharedSourceDir / "scala-2.10_2.11")
       else if (scalaVersion.value.startsWith("2.12") || scalaVersion.value.startsWith("2.13"))
@@ -46,8 +45,8 @@ lazy val justUtc = (project in file(".")).
       else
         Seq()
     }
-    , wartremoverErrors in (Compile, compile) ++= commonWarts((scalaBinaryVersion in update).value)
-    , wartremoverErrors in (Test, compile) ++= commonWarts((scalaBinaryVersion in update).value)
+    , Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value)
+    , Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value)
     , testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework"))
     /* Bintray { */
     , bintrayPackageLabels := Seq("Scala", "UTC", "DateTime")

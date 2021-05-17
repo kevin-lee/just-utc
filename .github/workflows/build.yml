@@ -10,9 +10,9 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { version: "2.10.7", binary-version: "2.10" }
           - { version: "2.11.12", binary-version: "2.11" }
           - { version: "2.12.10", binary-version: "2.12" }
+          - { version: "2.13.1",  binary-version: "2.13" }
 
     steps:
       - uses: actions/checkout@v1

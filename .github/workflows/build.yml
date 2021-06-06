@@ -11,8 +11,9 @@ jobs:
       matrix:
         scala:
           - { version: "2.11.12", binary-version: "2.11" }
-          - { version: "2.12.10", binary-version: "2.12" }
-          - { version: "2.13.1",  binary-version: "2.13" }
+          - { version: "2.12.14", binary-version: "2.12" }
+          - { version: "2.13.6",  binary-version: "2.13" }
+          - { version: "3.0.0",   binary-version: "3" }
 
     steps:
       - uses: actions/checkout@v1

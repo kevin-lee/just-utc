@@ -1,18 +1,15 @@
 package just.utc
 
+import just.fp.syntax._
+import just.utc.JDateTimeInUtc.ZoneIdUtc
+
 import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 import java.time.{Clock, DateTimeException, Instant, LocalDateTime}
 import java.util.Locale
-
-import just.fp.syntax._
-
-import just.utc.JDateTimeInUtc.ZoneIdUtc
-
 import scala.math.Ordered
 
-/**
-  * @author Kevin Lee
+/** @author Kevin Lee
   * @since 2018-09-12
   */
 final class Utc private (val instant: Instant) extends Ordered[Utc] {
@@ -24,7 +21,7 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] {
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   override def equals(that: Any): Boolean = that match {
     case thatUtc: Utc => this.epochMillis == thatUtc.epochMillis
-    case _ => false
+    case _            => false
   }
 
   @SuppressWarnings(Array("org.wartremover.warts.StringPlusAny"))
@@ -42,8 +39,7 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] {
 
   def minute: Int = jLocalDateTime.getMinute
 
-  /**
-    * Returns the week of a week based year using Locale.ROOT
+  /** Returns the week of a week based year using Locale.ROOT
     *
     * @return The week of a week based year using Locale.ROOT
     */
@@ -74,24 +70,25 @@ object Utc {
       new Utc(Instant.ofEpochMilli(epochMillis)).right
     } catch {
       case dateTimeException: DateTimeException =>
-        DateTimeError.epochMillisDateTime(
-          epochMillis
-        , dateTimeException
-        ).left
+        DateTimeError
+          .epochMillisDateTime(
+            epochMillis,
+            dateTimeException
+          )
+          .left
     }
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   def unsafeFromEpochMillis(epochMillis: Long): Utc =
     fromEpochMillis(epochMillis) match {
-      case Right(utc) => utc
-      case Left(DateTimeError.EpochMillisDateTime(_, cause)) => throw cause
-      case Left(DateTimeError.InstantDateTime(_, cause)) => throw cause
-      case Left(DateTimeError.ArithmeticError(_, cause)) => throw cause
-      case Left(DateTimeError.ZoneRules(_, cause)) => throw cause
+      case Right(utc)                                            => utc
+      case Left(DateTimeError.EpochMillisDateTime(_, cause))     => throw cause
+      case Left(DateTimeError.InstantDateTime(_, cause))         => throw cause
+      case Left(DateTimeError.ArithmeticError(_, cause))         => throw cause
+      case Left(DateTimeError.ZoneRules(_, cause))               => throw cause
       case Left(DateTimeError.UnsupportedTemporalType(_, cause)) => throw cause
-      case Left(DateTimeError.LocalDateTimeError(_, cause)) => throw cause
+      case Left(DateTimeError.LocalDateTimeError(_, cause))      => throw cause
     }
-
 
   def fromUtcLocalDateTime(localDateTime: LocalDateTime): Utc =
     new Utc(localDateTime.toInstant(JDateTimeInUtc.ZoneOffsetUtc))

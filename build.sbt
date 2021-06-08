@@ -4,15 +4,10 @@ import kevinlee.sbt.SbtCommon.crossVersionProps
 import just.semver.SemVer
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
-val ProjectScalaVersion: String     = "2.13.5"
-val CrossScalaVersions: Seq[String] = Seq("2.11.12", "2.12.13", "2.13.5", "3.0.0", ProjectScalaVersion).distinct
-
-lazy val justFp: ModuleID = "io.kevinlee" %% "just-fp-core" % "1.6.0"
-
-ThisBuild / scalaVersion := ProjectScalaVersion
-ThisBuild / organization := "io.kevinlee"
+ThisBuild / scalaVersion := props.ProjectScalaVersion
+ThisBuild / organization := props.Org
 ThisBuild / version := ProjectVersion
-ThisBuild / crossScalaVersions := CrossScalaVersions
+ThisBuild / crossScalaVersions := props.CrossScalaVersions
 ThisBuild / developers := List(
   Developer("Kevin-Lee", "Kevin Lee", "kevin.code@kevinlee.io", url("https://github.com/Kevin-Lee"))
 )
@@ -28,7 +23,7 @@ ThisBuild / scmInfo :=
 lazy val justUtc = (project in file(".")).settings(
   name := "just-utc",
   useAggressiveScalacOptions := true,
-  libraryDependencies := hedgehogAll ++ crossVersionProps(Seq(justFp), SemVer.parseUnsafe(scalaVersion.value)) {
+  libraryDependencies := hedgehogAll ++ crossVersionProps(List(libs.justFp), SemVer.parseUnsafe(scalaVersion.value)) {
     case (SemVer.Major(2), SemVer.Minor(10), _) =>
       libraryDependencies
         .value
@@ -55,9 +50,7 @@ lazy val justUtc = (project in file(".")).settings(
   (Test / compile / scalacOptions) := (Test / compile / scalacOptions).value.filterNot(_.startsWith("-P:wartremover")),
   testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework"))
   /* Bintray { */,
-  bintrayPackageLabels := Seq("Scala", "UTC", "DateTime"),
-  bintrayVcsUrl := Some("""git@github.com:Kevin-Lee/just-utc.git"""),
-  licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
+  licenses := List("MIT" -> url("http://opensource.org/licenses/MIT"))
   /* } Bintray */
   /* Coveralls { */,
   coverageHighlighting := (CrossVersion.partialVersion(scalaVersion.value) match {
@@ -69,6 +62,18 @@ lazy val justUtc = (project in file(".")).settings(
   coverallsTokenFile := Option(s"""${Path.userHome.absolutePath}/.coveralls-credentials""")
   /* } Coveralls */
 )
+
+lazy val props = new {
+  final val Org = "io.kevinlee"
+  final val CrossScalaVersions = Seq("2.11.12", "2.12.13", "2.13.5", "3.0.0").distinct
+  final val ProjectScalaVersion = CrossScalaVersions.last
+
+  final val JustFpVersion = "1.6.0"
+}
+
+lazy val libs = new {
+  lazy val justFp: ModuleID = "io.kevinlee" %% "just-fp-core" % props.JustFpVersion
+}
 
 val removeDottyIncompatible: ModuleID => Boolean =
   m =>

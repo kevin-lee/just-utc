@@ -20,7 +20,7 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] derives CanE
 
   override def equals(that: Any): Boolean = that match {
     case thatUtc: Utc => this.epochMillis == thatUtc.epochMillis
-    case _            => false
+    case _ => false
   }
 
   override def toString: String = s"Utc(${epochMillis.toString})"
@@ -78,13 +78,13 @@ object Utc {
 
   def unsafeFromEpochMillis(epochMillis: Long): Utc =
     fromEpochMillis(epochMillis) match {
-      case Right(utc)                                            => utc
-      case Left(DateTimeError.EpochMillisDateTime(_, cause))     => throw cause
-      case Left(DateTimeError.InstantDateTime(_, cause))         => throw cause
-      case Left(DateTimeError.ArithmeticError(_, cause))         => throw cause
-      case Left(DateTimeError.ZoneRules(_, cause))               => throw cause
+      case Right(utc) => utc
+      case Left(DateTimeError.EpochMillisDateTime(_, cause)) => throw cause
+      case Left(DateTimeError.InstantDateTime(_, cause)) => throw cause
+      case Left(DateTimeError.ArithmeticError(_, cause)) => throw cause
+      case Left(DateTimeError.ZoneRules(_, cause)) => throw cause
       case Left(DateTimeError.UnsupportedTemporalType(_, cause)) => throw cause
-      case Left(DateTimeError.LocalDateTimeError(_, cause))      => throw cause
+      case Left(DateTimeError.LocalDateTimeError(_, cause)) => throw cause
     }
 
   def fromUtcLocalDateTime(localDateTime: LocalDateTime): Utc =

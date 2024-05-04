@@ -3,24 +3,23 @@ package just.utc
 import hedgehog._
 import hedgehog.runner._
 
-/**
-  * @author Kevin Lee
+/** @author Kevin Lee
   * @since 2018-10-04
   */
 object UtcSpec extends Properties {
   override def tests: List[Test] = List(
-    property("testFromUtcLocalDateTime", testFromUtcLocalDateTime)
-  , property("testCompareToLess", testCompareToLess)
-  , property("testCompareToMore", testCompareToMore)
-  , property("testCompareToEqual", testCompareToEqual)
-  , property("testEqual", testEqual)
-  , property("testNotEqual", testNotEqual)
-  , property("testLess", testLess)
-  , property("testLessThanOrEqualTo_LessCase", testLessThanOrEqualTo_LessCase)
-  , property("testLessThanOrEqualTo_EqualCase", testLessThanOrEqualTo_EqualCase)
-  , property("testMore", testMore)
-  , property("testMoreThanOrEqualTo_MoreCase", testMoreThanOrEqualTo_MoreCase)
-  , property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase)
+    property("testFromUtcLocalDateTime", testFromUtcLocalDateTime),
+    property("testCompareToLess", testCompareToLess),
+    property("testCompareToMore", testCompareToMore),
+    property("testCompareToEqual", testCompareToEqual),
+    property("testEqual", testEqual),
+    property("testNotEqual", testNotEqual),
+    property("testLess", testLess),
+    property("testLessThanOrEqualTo_LessCase", testLessThanOrEqualTo_LessCase),
+    property("testLessThanOrEqualTo_EqualCase", testLessThanOrEqualTo_EqualCase),
+    property("testMore", testMore),
+    property("testMoreThanOrEqualTo_MoreCase", testMoreThanOrEqualTo_MoreCase),
+    property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase)
   )
 
   val validInstantMin: Long = Long.MinValue + 1
@@ -42,7 +41,7 @@ object UtcSpec extends Properties {
     expected <- Gen.long(Range.linear(validInstantMin, validInstantMax)).log("expected")
   } yield {
     val localDateTime = JDateTimeInUtc.unsafeToLocalDateTime(expected)
-    val actual = Utc.fromUtcLocalDateTime(localDateTime)
+    val actual        = Utc.fromUtcLocalDateTime(localDateTime)
     actual.epochMillis ==== expected
   }
 

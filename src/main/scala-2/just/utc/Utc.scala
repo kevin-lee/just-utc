@@ -7,12 +7,13 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 import java.time.{Clock, DateTimeException, Instant, LocalDateTime}
 import java.util.Locale
-import scala.math.Ordered
 
 /** @author Kevin Lee
   * @since 2018-09-12
   */
 final class Utc private (val instant: Instant) extends Ordered[Utc] {
+
+  lazy val epochMillisWithNanos: Long = instant.toEpochMilli * 1000000L + instant.getNano
 
   lazy val epochMillis: Long = instant.toEpochMilli
 
@@ -21,7 +22,7 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] {
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   override def equals(that: Any): Boolean = that match {
     case thatUtc: Utc => this.epochMillis == thatUtc.epochMillis
-    case _            => false
+    case _ => false
   }
 
   @SuppressWarnings(Array("org.wartremover.warts.StringPlusAny"))
@@ -63,7 +64,7 @@ object Utc {
   def unapply(utc: Utc): Option[Instant] =
     Option(utc).map(_.instant)
 
-  def now(): Utc = new Utc(Instant.ofEpochMilli(Clock.systemUTC().millis()))
+  def now(): Utc = new Utc(Clock.systemUTC().instant())
 
   def fromEpochMillis(epochMillis: Long): Either[DateTimeError, Utc] =
     try {
@@ -81,13 +82,13 @@ object Utc {
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   def unsafeFromEpochMillis(epochMillis: Long): Utc =
     fromEpochMillis(epochMillis) match {
-      case Right(utc)                                            => utc
-      case Left(DateTimeError.EpochMillisDateTime(_, cause))     => throw cause
-      case Left(DateTimeError.InstantDateTime(_, cause))         => throw cause
-      case Left(DateTimeError.ArithmeticError(_, cause))         => throw cause
-      case Left(DateTimeError.ZoneRules(_, cause))               => throw cause
+      case Right(utc) => utc
+      case Left(DateTimeError.EpochMillisDateTime(_, cause)) => throw cause
+      case Left(DateTimeError.InstantDateTime(_, cause)) => throw cause
+      case Left(DateTimeError.ArithmeticError(_, cause)) => throw cause
+      case Left(DateTimeError.ZoneRules(_, cause)) => throw cause
       case Left(DateTimeError.UnsupportedTemporalType(_, cause)) => throw cause
-      case Left(DateTimeError.LocalDateTimeError(_, cause))      => throw cause
+      case Left(DateTimeError.LocalDateTimeError(_, cause)) => throw cause
     }
 
   def fromUtcLocalDateTime(localDateTime: LocalDateTime): Utc =

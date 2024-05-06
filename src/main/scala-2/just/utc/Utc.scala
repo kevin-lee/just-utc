@@ -17,11 +17,11 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] {
 
   lazy val epochMillis: Long = instant.toEpochMilli
 
-  override lazy val hashCode: Int = epochMillis.hashCode()
+  override lazy val hashCode: Int = epochMillisWithNanos.hashCode()
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   override def equals(that: Any): Boolean = that match {
-    case thatUtc: Utc => this.epochMillis == thatUtc.epochMillis
+    case thatUtc: Utc => this.instant == thatUtc.instant
     case _ => false
   }
 

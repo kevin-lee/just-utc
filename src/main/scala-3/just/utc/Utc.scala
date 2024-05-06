@@ -1,6 +1,6 @@
 package just.utc
 
-import just.fp.syntax._
+import just.fp.syntax.*
 import just.utc.JDateTimeInUtc.ZoneIdUtc
 
 import java.time.format.DateTimeFormatter
@@ -18,10 +18,12 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] derives CanE
 
   lazy val epochMillis: Long = instant.toEpochMilli
 
-  override lazy val hashCode: Int = epochMillis.hashCode()
+  override lazy val hashCode: Int = epochMillisWithNanos.hashCode()
+
+  private given canEqualInstant: CanEqual[Instant, Instant] = CanEqual.derived
 
   override def equals(that: Any): Boolean = that match {
-    case thatUtc: Utc => this.epochMillis == thatUtc.epochMillis
+    case thatUtc: Utc => this.instant == thatUtc.instant
     case _ => false
   }
 

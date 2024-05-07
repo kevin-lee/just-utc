@@ -25,8 +25,7 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] {
     case _ => false
   }
 
-  @SuppressWarnings(Array("org.wartremover.warts.StringPlusAny"))
-  override def toString: String = s"Utc($epochMillis)"
+  override def toString: String = s"Utc(${epochMillisWithNanos.toString})"
 
   lazy val jLocalDateTime: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneIdUtc)
 

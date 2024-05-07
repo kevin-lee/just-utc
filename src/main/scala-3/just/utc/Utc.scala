@@ -27,7 +27,7 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] derives CanE
     case _ => false
   }
 
-  override def toString: String = s"Utc(${epochMillis.toString})"
+  override def toString: String = s"Utc(${epochMillisWithNanos.toString})"
 
   lazy val jLocalDateTime: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneIdUtc)
 

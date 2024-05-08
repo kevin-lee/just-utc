@@ -16,7 +16,7 @@ jobs:
           - { version: "3.0.0",   binary-version: "3" }
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
       - name: Cache Coursier
         uses: actions/cache@v1
@@ -40,7 +40,7 @@ jobs:
   build_scala2_13:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
       - name: Cache Coursier
         uses: actions/cache@v1

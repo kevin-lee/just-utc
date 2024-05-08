@@ -22,7 +22,6 @@ ThisBuild / scmInfo :=
 
 lazy val justUtc = (project in file(".")).settings(
   name := "just-utc",
-  useAggressiveScalacOptions := true,
   libraryDependencies := hedgehogAll ++ crossVersionProps(List(libs.justFp), SemVer.parseUnsafe(scalaVersion.value)) {
     case (SemVer.Major(2), SemVer.Minor(10), _) =>
       libraryDependencies

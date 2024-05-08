@@ -41,6 +41,8 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] derives CanE
 
   def minute: Int = jLocalDateTime.getMinute
 
+  def seconds: Int = jLocalDateTime.getSecond
+
   /** Returns the week of a week based year using Locale.ROOT
     *
     * @return The week of a week based year using Locale.ROOT

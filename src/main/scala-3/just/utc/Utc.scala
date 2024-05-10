@@ -67,7 +67,7 @@ object Utc {
   def unapply(utc: Utc): Option[Instant] =
     Option(utc).map(_.instant)
 
-  def now(): Utc = new Utc(Instant.ofEpochMilli(Clock.systemUTC().millis()))
+  def now(): Utc = new Utc(Clock.systemUTC().instant())
 
   def fromEpochMillis(epochMillis: Long): Either[DateTimeError, Utc] =
     try {

@@ -3,6 +3,8 @@ package just.utc
 import hedgehog._
 import hedgehog.runner._
 
+import java.time.Instant
+
 /** @author Kevin Lee
   * @since 2018-10-04
   */
@@ -19,7 +21,8 @@ object UtcSpec extends Properties {
     property("testLessThanOrEqualTo_EqualCase", testLessThanOrEqualTo_EqualCase),
     property("testMore", testMore),
     property("testMoreThanOrEqualTo_MoreCase", testMoreThanOrEqualTo_MoreCase),
-    property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase)
+    property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase),
+    property("test Utc.fromInstant", testFromInstant)
   )
 
   val validInstantMin: Long = Long.MinValue + 1
@@ -99,5 +102,16 @@ object UtcSpec extends Properties {
   def testMoreThanOrEqualTo_EqualCase: Property = for {
     x <- Gen.long(Range.linear(validInstantMin, validInstantMax)).log("x")
   } yield Result.assert(Utc.unsafeFromEpochMillis(x) >= Utc.unsafeFromEpochMillis(x))
+
+  def testFromInstant: Property =
+    for {
+      now <- Gen.constant(Instant.now()).log("now")
+    } yield {
+      val utc = Utc.fromInstant(now)
+
+      val expected = now
+      val actual   = utc.instant
+      actual ==== expected
+    }
 
 }

@@ -69,6 +69,8 @@ object Utc {
 
   def now(): Utc = new Utc(Clock.systemUTC().instant())
 
+  def fromInstant(instant: Instant): Utc = new Utc(instant)
+
   def fromEpochMillis(epochMillis: Long): Either[DateTimeError, Utc] =
     try {
       new Utc(Instant.ofEpochMilli(epochMillis)).right

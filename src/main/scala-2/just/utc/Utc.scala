@@ -13,7 +13,7 @@ import java.util.Locale
   */
 final class Utc private (val instant: Instant) extends Ordered[Utc] {
 
-  lazy val epochMillisWithNanos: Long = instant.toEpochMilli * 1000000L + instant.getNano
+  lazy val epochMillisWithNanos: Long = instant.toEpochMilli / 1000L * 1000000000L + instant.getNano
 
   lazy val epochMillis: Long = instant.toEpochMilli
 

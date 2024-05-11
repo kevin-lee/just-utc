@@ -4,7 +4,7 @@ import just.fp.syntax.*
 import just.utc.JDateTimeInUtc.ZoneIdUtc
 
 import java.time.format.DateTimeFormatter
-import java.time.temporal.WeekFields
+import java.time.temporal.{ChronoField, WeekFields}
 import java.time.{Clock, DateTimeException, Instant, LocalDateTime}
 import java.util.Locale
 import scala.math.Ordered
@@ -42,6 +42,8 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] derives CanE
   def minute: Int = jLocalDateTime.getMinute
 
   def seconds: Int = jLocalDateTime.getSecond
+
+  def milliSeconds: Int = instant.get(ChronoField.MILLI_OF_SECOND)
 
   /** Returns the week of a week based year using Locale.ROOT
     *

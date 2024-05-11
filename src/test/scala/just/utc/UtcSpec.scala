@@ -22,7 +22,9 @@ object UtcSpec extends Properties {
     property("testMore", testMore),
     property("testMoreThanOrEqualTo_MoreCase", testMoreThanOrEqualTo_MoreCase),
     property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase),
-    property("test Utc.fromInstant", testFromInstant)
+    property("test Utc.fromInstant", testFromInstant),
+    property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase),
+    property("test milliSeconds", testMilliSeconds)
   )
 
   val validInstantMin: Long = Long.MinValue + 1
@@ -113,5 +115,13 @@ object UtcSpec extends Properties {
       val actual   = utc.instant
       actual ==== expected
     }
+
+  def testMilliSeconds: Property = for {
+    now      <- Gen.constant(Instant.now()).log("now")
+    expected <- Gen.constant(now.getNano / 1000000).log("expected")
+  } yield {
+    val actual = Utc.fromInstant(now)
+    actual.milliSeconds ==== expected
+  }
 
 }

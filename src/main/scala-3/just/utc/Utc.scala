@@ -14,7 +14,7 @@ import scala.math.Ordered
   */
 final class Utc private (val instant: Instant) extends Ordered[Utc] derives CanEqual {
 
-  lazy val epochMillisWithNanos: Long = instant.toEpochMilli * 1_000_000L + instant.getNano
+  lazy val epochMillisWithNanos: Long = instant.toEpochMilli / 1000L * 1_000_000_000L + instant.getNano
 
   lazy val epochMillis: Long = instant.toEpochMilli
 

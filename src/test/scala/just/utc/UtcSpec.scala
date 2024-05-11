@@ -24,6 +24,7 @@ object UtcSpec extends Properties {
     property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase),
     property("test Utc.fromInstant", testFromInstant),
     property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase),
+    property("test epochMillisWithNanos", testEpochMillisWithNanos),
     property("test milliSeconds", testMilliSeconds)
   )
 
@@ -115,6 +116,14 @@ object UtcSpec extends Properties {
       val actual   = utc.instant
       actual ==== expected
     }
+
+  def testEpochMillisWithNanos: Property = for {
+    now      <- Gen.constant(Instant.now()).log("now")
+    expected <- Gen.constant(now.toEpochMilli * 1000000 + now.getNano % 1000000).log("expected")
+  } yield {
+    val actual = Utc.fromInstant(now)
+    actual.epochMillisWithNanos ==== expected
+  }
 
   def testMilliSeconds: Property = for {
     now      <- Gen.constant(Instant.now()).log("now")

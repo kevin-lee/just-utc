@@ -3,7 +3,7 @@ package just.utc
 import hedgehog._
 import hedgehog.runner._
 
-import java.time.Instant
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 /** @author Kevin Lee
   * @since 2018-10-04
@@ -25,6 +25,7 @@ object UtcSpec extends Properties {
     property("test Utc.fromInstant", testFromInstant),
     property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase),
     property("test epochMillisWithNanos", testEpochMillisWithNanos),
+    property("test seconds", testSeconds),
     property("test milliSeconds", testMilliSeconds)
   )
 
@@ -123,6 +124,15 @@ object UtcSpec extends Properties {
   } yield {
     val actual = Utc.fromInstant(now)
     actual.epochMillisWithNanos ==== expected
+  }
+
+  def testSeconds: Property = for {
+    now           <- Gen.constant(Instant.now()).log("now")
+    localDateTime <- Gen.constant(LocalDateTime.ofInstant(now, ZoneOffset.UTC)).log("localDateTime")
+    expected      <- Gen.constant(localDateTime.getSecond).log("expected")
+  } yield {
+    val actual = Utc.fromInstant(now)
+    actual.seconds ==== expected
   }
 
   def testMilliSeconds: Property = for {

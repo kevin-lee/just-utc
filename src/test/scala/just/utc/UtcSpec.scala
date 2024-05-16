@@ -25,6 +25,7 @@ object UtcSpec extends Properties {
     property("test Utc.fromInstant", testFromInstant),
     property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase),
     property("test epochMillisWithNanos", testEpochMillisWithNanos),
+    property("test dayOfWeek", testDayOfWeek),
     property("test month", testMonth),
     property("test dayOfMonth", testDayOfMonth),
     property("test hour", testHour),
@@ -128,6 +129,15 @@ object UtcSpec extends Properties {
   } yield {
     val actual = Utc.fromInstant(now)
     actual.epochMillisWithNanos ==== expected
+  }
+
+  def testDayOfWeek: Property = for {
+    now           <- Gen.constant(Instant.now()).log("now")
+    localDateTime <- Gen.constant(LocalDateTime.ofInstant(now, ZoneOffset.UTC)).log("localDateTime")
+    expected      <- Gen.constant(localDateTime.getDayOfWeek.getValue).log("expected")
+  } yield {
+    val actual = Utc.fromInstant(now)
+    actual.dayOfWeek ==== expected
   }
 
   def testMonth: Property = for {

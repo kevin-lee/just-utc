@@ -29,7 +29,7 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] {
 
   lazy val jLocalDateTime: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneIdUtc)
 
-  def dayOfWeek: Int = jLocalDateTime.getDayOfWeek.getValue
+  def dayOfWeekValue: Int = jLocalDateTime.getDayOfWeek.getValue
 
   def month: Int = jLocalDateTime.getMonth.getValue
 

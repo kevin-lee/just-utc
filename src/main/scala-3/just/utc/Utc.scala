@@ -35,7 +35,7 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] derives CanE
 
   def month: Int = jLocalDateTime.getMonth.getValue
 
-  def dayOfMonth: Int = jLocalDateTime.getDayOfMonth
+  def dayOfMonthValue: Int = jLocalDateTime.getDayOfMonth
 
   def hour: Int = jLocalDateTime.getHour
 

@@ -2,6 +2,7 @@ package just.utc
 
 import just.fp.syntax.*
 import just.utc.JDateTimeInUtc.ZoneIdUtc
+import just.utc.types.DayOfWeek
 
 import java.time.format.DateTimeFormatter
 import java.time.temporal.{ChronoField, WeekFields}
@@ -30,6 +31,8 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] derives CanE
   override def toString: String = s"Utc(${epochMillisWithNanos.toString})"
 
   lazy val jLocalDateTime: LocalDateTime = LocalDateTime.ofInstant(instant, ZoneIdUtc)
+
+  def dayOfWeek: DayOfWeek = DayOfWeek.fromJava(jLocalDateTime.getDayOfWeek)
 
   def dayOfWeekValue: Int = jLocalDateTime.getDayOfWeek.getValue
 

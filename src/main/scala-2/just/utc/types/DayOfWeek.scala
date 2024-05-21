@@ -1,5 +1,7 @@
 package just.utc.types
 
+import just.fp.syntax._
+
 import java.time.{DayOfWeek => JDayOfWeek}
 
 /** @author Kevin Lee
@@ -35,14 +37,14 @@ object DayOfWeek {
     }
 
   def fromDayOfWeekInt(dayOfWeekInt: Int): Option[DayOfWeek] = dayOfWeekInt match {
-    case 1 => Some(monday)
-    case 2 => Some(tuesday)
-    case 3 => Some(wednesday)
-    case 4 => Some(thursday)
-    case 5 => Some(friday)
-    case 6 => Some(saturday)
-    case 7 => Some(sunday)
-    case _ => None
+    case 1 => monday.some
+    case 2 => tuesday.some
+    case 3 => wednesday.some
+    case 4 => thursday.some
+    case 5 => friday.some
+    case 6 => saturday.some
+    case 7 => sunday.some
+    case _ => none
   }
 
   def unsafeFromDayOfWeekInt(dayOfWeekInt: Int): DayOfWeek =

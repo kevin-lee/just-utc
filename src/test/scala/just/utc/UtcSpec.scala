@@ -2,6 +2,7 @@ package just.utc
 
 import hedgehog._
 import hedgehog.runner._
+import just.utc.types.DayOfWeek
 
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
@@ -25,6 +26,7 @@ object UtcSpec extends Properties {
     property("test Utc.fromInstant", testFromInstant),
     property("testMoreThanOrEqualTo_EqualCase", testMoreThanOrEqualTo_EqualCase),
     property("test epochMillisWithNanos", testEpochMillisWithNanos),
+    property("test dayOfWeek", testDayOfWeek),
     property("test dayOfWeekValue", testDayOfWeekValue),
     property("test month", testMonth),
     property("test dayOfMonth", testDayOfMonth),
@@ -129,6 +131,21 @@ object UtcSpec extends Properties {
   } yield {
     val actual = Utc.fromInstant(now)
     actual.epochMillisWithNanos ==== expected
+  }
+
+  def testDayOfWeek: Property = for {
+    now           <- Gen.constant(Instant.now()).log("now")
+    localDateTime <- Gen.constant(LocalDateTime.ofInstant(now, ZoneOffset.UTC)).log("localDateTime")
+    expectedJava  <- Gen.constant(localDateTime.getDayOfWeek).log("expectedJava")
+    expected      <- Gen.constant(DayOfWeek.fromJava(expectedJava)).log("expected")
+  } yield {
+    val actual = Utc.fromInstant(now)
+    Result.all(
+      List(
+        (actual.dayOfWeek ==== expected).log("## Expected DayOfWeek"),
+        (actual.dayOfWeek.toJava ==== expectedJava).log("## actual.toJava == Expected java.time.DayOfWeek")
+      )
+    )
   }
 
   def testDayOfWeekValue: Property = for {

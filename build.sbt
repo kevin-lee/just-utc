@@ -64,7 +64,7 @@ lazy val justUtc = (project in file(".")).settings(
 
 lazy val props = new {
   final val Org = "io.kevinlee"
-  final val CrossScalaVersions = Seq("2.11.12", "2.12.13", "2.13.5", "3.0.0").distinct
+  final val CrossScalaVersions = Seq("2.11.12", "2.12.13", "2.13.10", "3.0.0").distinct
   final val ProjectScalaVersion = CrossScalaVersions.last
 
   final val JustFpVersion = "1.6.0"

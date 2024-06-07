@@ -58,7 +58,7 @@ final class Utc private (val instant: Instant) extends Ordered[Utc] derives CanE
 
   lazy val render: String = jLocalDateTime.toString
 
-  def renderWith(dateTimeFormatter: DateTimeFormatter): String =
+  def renderWithFormatter(dateTimeFormatter: DateTimeFormatter): String =
     jLocalDateTime.format(dateTimeFormatter)
 
 }

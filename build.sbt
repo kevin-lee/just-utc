@@ -19,26 +19,32 @@ ThisBuild / scmInfo :=
       "git@github.com:Kevin-Lee/just-utc.git"
     )
   )
+ThisBuild / licenses := List(License.MIT)
 
-lazy val justUtc = (project in file(".")).settings(
-  name := "just-utc",
-  libraryDependencies := hedgehogAll ++ crossVersionProps(List(libs.justFp), SemVer.parseUnsafe(scalaVersion.value)) {
+lazy val justUtc = (project in file("."))
+  .settings(
+    name := prefixedProjectName(""),
+  )
+  .aggregate(core)
+
+lazy val core = module("core").settings(
+  libraryDependencies := crossVersionProps(List(libs.justFp), SemVer.parseUnsafe(scalaVersion.value)) {
     case (SemVer.Major(2), SemVer.Minor(10), _) =>
       libraryDependencies
         .value
         .filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
-    case x                                      =>
+    case x =>
       libraryDependencies.value
   },
   libraryDependencies := libraryDependencies.value.filterNot(removeDottyIncompatible),
   Compile / unmanagedSourceDirectories ++= {
-    val sharedSourceDir = (ThisBuild / baseDirectory).value / "src/main"
+    val sharedSourceDir = baseDirectory.value / "src/main"
     if (scalaVersion.value.startsWith("2.10") || scalaVersion.value.startsWith("2.11"))
       Seq(sharedSourceDir / "scala-2.10_2.11")
     else if (scalaVersion.value.startsWith("2.12") || scalaVersion.value.startsWith("2.13"))
       Seq(sharedSourceDir / "scala-2.12_2.13")
     else
-      Seq()
+      Seq.empty
   },
   Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
   Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
@@ -47,24 +53,15 @@ lazy val justUtc = (project in file(".")).settings(
     .value
     .filterNot(_.startsWith("-P:wartremover")),
   (Test / compile / scalacOptions) := (Test / compile / scalacOptions).value.filterNot(_.startsWith("-P:wartremover")),
-  testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework"))
-  /* Bintray { */,
-  licenses := List("MIT" -> url("http://opensource.org/licenses/MIT"))
-  /* } Bintray */
-  /* Coveralls { */,
-  coverageHighlighting := (CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, 10)) =>
-      false
-    case _             =>
-      true
-  }),
-  coverallsTokenFile := Option(s"""${Path.userHome.absolutePath}/.coveralls-credentials""")
-  /* } Coveralls */
+  licenses := List(License.MIT),
 )
 
 lazy val props = new {
   final val Org = "io.kevinlee"
-  final val CrossScalaVersions = Seq("2.11.12", "2.12.13", "2.13.10", "3.0.0").distinct
+
+  val ProjectName = "just-utc"
+
+  final val CrossScalaVersions  = Seq("2.11.12", "2.12.13", "2.13.10", "3.0.0").distinct
   final val ProjectScalaVersion = CrossScalaVersions.last
 
   final val JustFpVersion = "1.6.0"
@@ -82,6 +79,47 @@ val removeDottyIncompatible: ModuleID => Boolean =
       m.name == "better-monadic-for" ||
       m.name == "mdoc"
 
+def prefixedProjectName(projectName: String): String =
+  if (projectName.isEmpty) props.ProjectName else s"${props.ProjectName}-$projectName"
+
+def module(projectName: String): Project = {
+  val prefixedName = prefixedProjectName(projectName)
+
+  Project(projectName, file(s"modules/$prefixedName"))
+    .settings(
+      name := prefixedName,
+      libraryDependencies ++= hedgehogAll,
+      Compile / unmanagedSourceDirectories ++= {
+        val sharedSourceDir = baseDirectory.value / "src/main"
+        if (scalaVersion.value.startsWith("2.10") || scalaVersion.value.startsWith("2.11"))
+          Seq(sharedSourceDir / "scala-2.10_2.11")
+        else if (scalaVersion.value.startsWith("2.12") || scalaVersion.value.startsWith("2.13"))
+          Seq(sharedSourceDir / "scala-2.12_2.13")
+        else
+          Seq.empty
+      },
+      Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
+      Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
+      scalacOptions := scalacOptions.value.filterNot(_.startsWith("-P:wartremover")),
+      (Compile / compile / scalacOptions) := (Compile / compile / scalacOptions)
+        .value
+        .filterNot(_.startsWith("-P:wartremover")),
+      (Test / compile / scalacOptions) := (Test / compile / scalacOptions)
+        .value
+        .filterNot(_.startsWith("-P:wartremover")),
+      licenses := List(License.MIT),
+      /* Coveralls { */
+      coverageHighlighting := (CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, 10)) =>
+          false
+        case _ =>
+          true
+      }),
+      coverallsTokenFile := Option(s"""${Path.userHome.absolutePath}/.coveralls-credentials""")
+      /* } Coveralls */
+    )
+}
+
 def gitSubmodule(path: String): File = {
   @annotation.tailrec
   def search(parentPath: File): Option[File] = Option(parentPath) match {
@@ -91,7 +129,7 @@ def gitSubmodule(path: String): File = {
       } else {
         search(parentDir.getParentFile)
       }
-    case None            =>
+    case None =>
       None
   }
 

@@ -24,12 +24,21 @@ ThisBuild / licenses := List(License.MIT)
 lazy val justUtc = (project in file("."))
   .settings(
     name := prefixedProjectName(""),
+    libraryDependencies := crossVersionProps(List(libs.justFp), SemVer.parseUnsafe(scalaVersion.value)) {
+      case (SemVer.Major(2), SemVer.Minor(11), _) =>
+        libraryDependencies
+          .value
+          .filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
+      case x =>
+        libraryDependencies.value
+    },
+
   )
   .aggregate(core)
 
 lazy val core = module("core").settings(
   libraryDependencies := crossVersionProps(List(libs.justFp), SemVer.parseUnsafe(scalaVersion.value)) {
-    case (SemVer.Major(2), SemVer.Minor(10), _) =>
+    case (SemVer.Major(2), SemVer.Minor(11), _) =>
       libraryDependencies
         .value
         .filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
@@ -61,7 +70,7 @@ lazy val props = new {
 
   val ProjectName = "just-utc"
 
-  final val CrossScalaVersions  = Seq("2.11.12", "2.12.13", "2.13.10", "3.0.0").distinct
+  final val CrossScalaVersions  = Seq("2.11.12", "2.12.18", "2.13.16", "3.3.6").distinct
   final val ProjectScalaVersion = CrossScalaVersions.last
 
   final val JustFpVersion = "1.6.0"

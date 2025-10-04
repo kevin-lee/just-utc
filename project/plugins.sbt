@@ -1,7 +1,7 @@
 logLevel := sbt.Level.Warn
 
-addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.21")
-addSbtPlugin("org.scoverage"   % "sbt-scoverage"   % "2.0.7")
+addSbtPlugin("org.wartremover" % "sbt-wartremover" % "3.4.1")
+addSbtPlugin("org.scoverage"   % "sbt-scoverage"   % "2.3.1")
 addSbtPlugin("org.scoverage"   % "sbt-coveralls"   % "1.3.11")
 
 val SbtDevOopsVersion = "3.1.0"

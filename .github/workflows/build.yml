@@ -11,9 +11,9 @@ jobs:
       matrix:
         scala:
           - { version: "2.11.12", binary-version: "2.11", java-version: "11", java-distribution: "temurin" }
-          - { version: "2.12.14", binary-version: "2.12", java-version: "11", java-distribution: "temurin" }
-          - { version: "2.13.10", binary-version: "2.13", java-version: "11", java-distribution: "temurin" }
-          - { version: "3.0.0",   binary-version: "3"   , java-version: "11", java-distribution: "temurin" }
+          - { version: "2.12.18", binary-version: "2.12", java-version: "11", java-distribution: "temurin" }
+          - { version: "2.13.16", binary-version: "2.13", java-version: "11", java-distribution: "temurin" }
+          - { version: "3.3.6",   binary-version: "3"   , java-version: "11", java-distribution: "temurin" }
 
     steps:
       - uses: actions/checkout@v5
@@ -41,4 +41,4 @@ jobs:
       - name: Build for Scala 2.13
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        run: .github/workflows/sbt-build.sh 2.13.10
+        run: .github/workflows/sbt-build.sh 2.13.16
